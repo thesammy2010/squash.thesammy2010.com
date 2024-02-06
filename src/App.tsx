@@ -9,10 +9,7 @@ export default function App() {
 		<div id="page-container">
 			<div id="router">
 				<Routes>
-					<Route path="/">
-						<Route index element={<HomePage />} />
-						<Route path="*" element={<NotFound />} />
-					</Route>
+                    <Route path="/" element={<HomePage />} />
 				</Routes>
 			</div>
 		</div>
