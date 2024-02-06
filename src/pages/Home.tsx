@@ -1,45 +1,26 @@
-import { useEffect, useState } from 'react';
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import { useEffect, useRef, useState } from 'react';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import axios from 'axios';
-// import UserProfile from "../components/profile";
+import {decodeJwt} from 'jose';
+import UserProfile from "../components/profile";
+
+import './Home.css'
+
+const decodeUserDate = (data: string | undefined): any => {
+    if (data) {
+        const resp: any = decodeJwt(data)
+        if (resp) {
+            return resp
+        }
+    }
+    return {}
+}
 
 const HomePage = () => {
-	const [user, setUser] = useState<any>([]);
 	const [profile, setProfile] = useState<any>();
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
 	const [loginFailed, setLoginFailed] = useState<boolean>(false);
 	const [buttonClicked, setButtonClicked] = useState<boolean>(false);
-
-	const logIn = useGoogleLogin({
-		onSuccess: codeResponse => {
-			console.log('Successfully logged in');
-			setUser(codeResponse);
-			setLoggedIn(true);
-		},
-		onError: error => {
-			console.log('Login Failed:', error);
-			setLoginFailed(true);
-		}
-	});
-
-	useEffect(() => {
-		if (user.access_token) {
-			axios
-				.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-					headers: {
-						Authorization: `Bearer ${user.access_token}`,
-						Accept: 'application/json'
-					}
-				})
-				.then(res => {
-					setProfile(res.data);
-				})
-				.catch(err => {
-					console.log(err);
-					setLoginFailed(true);
-				});
-		}
-	}, [user]);
 
 	const logOut = () => {
 		googleLogout();
@@ -47,33 +28,50 @@ const HomePage = () => {
 	};
 
 	return (
-		<div>
-			<h1>How2Squash</h1>
-			<h6>This page is currently a work in progress</h6>
+        <div id="login" className="header">
+            <h1>How2Squash</h1>
+            <h4>This page is currently a work in progress</h4>
 			<br />
 			<br />
-			{profile ? (
-				<div>
-					<img src={profile.picture} alt="user" />
-					<h3>User Logged in</h3>
-					<p>Name: {profile.name}</p>
-					<p>Email Address: {profile.email}</p>
-					<br />
-					<br />
-					<button onClick={logOut}>Log out</button>
-				</div>
-			) : (
-				<button
-					onClick={() => {
-						setButtonClicked(true);
-						logIn();
-					}}
-				>
-					Sign in with Google 🚀{' '}
-				</button>
-			)}
-		</div>
+            <GoogleLogin
+                logo_alignment="center"
+                text="continue_with"
+                onSuccess={credentialResponse => {
+                    setButtonClicked(true)
+                    setLoggedIn(true)
+                    setProfile(decodeUserDate(credentialResponse.credential))
+                }}
+                onError={() => {
+                    console.log('Login Failed');
+                    setButtonClicked(true)
+                    setLoginFailed(true)
+                }}
+            />
+            <br />
+            {
+                profile ? (
+                    <div>
+                        <UserProfile name={profile.name} email={profile.email} picture={profile.picture}/>
+                        <button onClick={logOut}>Log out</button>
+                    </div>
+                ) : (
+                    <div>
+                        <h3>User is not currently logged in</h3>
+                    </div>
+                )
+            }
+            {
+                loginFailed ? (
+                    <div>
+                        <h3>Something went wrong logging the user in. Please contact the developer</h3>
+                    </div>
+                ) : <></>
+            }
+            <br />
+        </div>
+
 	);
 };
 
 export default HomePage;
+
