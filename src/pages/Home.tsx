@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
-import axios from 'axios';
-import {decodeJwt} from 'jose';
+import { decodeJwt } from 'jose';
 import UserProfile from "../components/profile";
 
 import './Home.css'
@@ -20,33 +19,36 @@ const HomePage = () => {
 	const [profile, setProfile] = useState<any>();
 	const [loggedIn, setLoggedIn] = useState<boolean>(false);
 	const [loginFailed, setLoginFailed] = useState<boolean>(false);
-	const [buttonClicked, setButtonClicked] = useState<boolean>(false);
 
 	const logOut = () => {
 		googleLogout();
 		setProfile(null);
+        setLoggedIn(false);
 	};
 
 	return (
-        <div id="login" className="header">
+        <div className="header">
             <h1>How2Squash</h1>
             <h4>This page is currently a work in progress</h4>
 			<br />
 			<br />
-            <GoogleLogin
-                logo_alignment="center"
-                text="continue_with"
-                onSuccess={credentialResponse => {
-                    setButtonClicked(true)
-                    setLoggedIn(true)
-                    setProfile(decodeUserDate(credentialResponse.credential))
-                }}
-                onError={() => {
-                    console.log('Login Failed');
-                    setButtonClicked(true)
-                    setLoginFailed(true)
-                }}
-            />
+            {
+                !loggedIn ? (
+                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>             
+                        <GoogleLogin
+                            text="continue_with"
+                            onSuccess={credentialResponse => {
+                                setLoggedIn(true)
+                                setProfile(decodeUserDate(credentialResponse.credential))
+                            }}
+                            onError={() => {
+                                console.log('Login Failed');
+                                setLoginFailed(true)
+                            }}
+                        />
+                    </div>
+                ) : <></>
+            }
             <br />
             {
                 profile ? (

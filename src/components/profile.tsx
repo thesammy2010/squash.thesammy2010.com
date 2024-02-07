@@ -14,8 +14,8 @@ export default class UserProfile extends React.Component<Props, State> {
             <div>
                 <img src={this.props.picture} alt="user" />
                 <h3>User Logged in</h3>
-                <p>Name: {this.props.name}</p>
-                <p>Email: {this.props.email}</p>
+                <p><strong>Name:</strong> {this.props.name}</p>
+                <p><strong>Email:</strong> {this.props.email}</p>
             </div>
         )
     }
