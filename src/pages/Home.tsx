@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GoogleLogin, googleLogout } from "@react-oauth/google";
-import { timedWait, timeout } from "../utils"
+import { timedWait } from "../utils";
 import Profile from "../components/profile";
 
 import "./Home.css";
@@ -11,20 +11,20 @@ const updateHeaders = (token: string) => {
 };
 
 const HomePage = () => {
-  // const [profile, setProfile] = useState<any>();
   const [loggedIntoGoogle, setLoggedIntoGoogle] = useState<boolean>(false);
-  const [loginToGoogleFailed, setLoginToGoogleFailed] = useState<boolean>(false);
+  const [loginToGoogleFailed, setLoginToGoogleFailed] =
+    useState<boolean>(false);
   const [loggedIntoBackend, setLoggedIntoBackend] = useState<boolean>(false);
-  const [loggedIntoBackendFailed, setLoggedIntoBackendFailed] = useState<boolean>(false);
+  const [loggedIntoBackendFailed, setLoggedIntoBackendFailed] =
+    useState<boolean>(false);
   const [backendLoginError, setBackendLoginError] = useState<string>("");
-  const [retryCount, setRetryCount] = useState<number>(0)
-  //   const [spinner, setSpinner] = useState(false);    
+  const [retryCount, setRetryCount] = useState<number>(0);
 
   const logOutOfGoogle = () => {
     googleLogout();
     setLoggedIntoGoogle(false);
-    setLoggedIntoBackend(false)
-    delete axios.defaults.headers.common["Authorization"]
+    setLoggedIntoBackend(false);
+    delete axios.defaults.headers.common["Authorization"];
     localStorage.removeItem("userData_id");
     localStorage.removeItem("userData_roles");
   };
@@ -34,22 +34,25 @@ const HomePage = () => {
       .put("/v1/squash/login")
       .then((res) => {
         if (res) {
-          setLoggedIntoBackend(true)
-          setBackendLoginError("")
-          setLoggedIntoBackendFailed(false)
+          setLoggedIntoBackend(true);
+          setBackendLoginError("");
+          setLoggedIntoBackendFailed(false);
           localStorage.setItem("userData_id", res.data.id);
-          localStorage.setItem("userData_roles", JSON.stringify(res.data.roles));
+          localStorage.setItem(
+            "userData_roles",
+            JSON.stringify(res.data.roles)
+          );
         }
       })
       .catch((reason) => {
-        setLoggedIntoBackendFailed(true)
-        setBackendLoginError(String(reason))
+        setLoggedIntoBackendFailed(true);
+        setBackendLoginError(String(reason));
       });
   };
 
   const logoutGoogleButton = (
     <button onClick={logOutOfGoogle}>Google Logout</button>
-  )
+  );
 
   return (
     <div className="page">
@@ -59,8 +62,7 @@ const HomePage = () => {
         <div>
           <h6>Continue with Google to proceed</h6>
 
-          <div className="signInButton"
-          >
+          <div className="signInButton">
             <GoogleLogin
               text="continue_with"
               onSuccess={(credentialResponse) => {
@@ -93,29 +95,34 @@ const HomePage = () => {
       )}
       {loggedIntoBackendFailed ? (
         <div>
-            <h6>Error logging into How2Squash backend. Contact the developer</h6>
-            <code>{backendLoginError}</code>
-            <div>
-            <button onClick={async () => {
-                setRetryCount(retryCount + 1)
-                setBackendLoginError("")
-                setLoggedIntoBackend(false)
-                await timedWait()
-                logIntoBackend()
-            }} disabled={retryCount > 3}>Retry</button>
-            </div>
+          <h6>Error logging into How2Squash backend. Contact the developer</h6>
+          <code>{backendLoginError}</code>
+          <div>
+            <button
+              onClick={async () => {
+                setRetryCount(retryCount + 1);
+                setBackendLoginError("");
+                setLoggedIntoBackend(false);
+                await timedWait();
+                logIntoBackend();
+              }}
+              disabled={retryCount > 3}
+            >
+              Retry
+            </button>
+          </div>
         </div>
-
-      ): <></>
-      }
-      {
-        loggedIntoBackend ? (
-            <div>
-                <Profile/>
-                {logoutGoogleButton}
-            </div>
-        ) : <></>
-      }
+      ) : (
+        <></>
+      )}
+      {loggedIntoBackend ? (
+        <div>
+          <Profile />
+          {logoutGoogleButton}
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
