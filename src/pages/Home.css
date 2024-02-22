@@ -1,12 +1,31 @@
-.header {
-    text-align: center;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+body table {
+  margin: 0 auto;
 }
-  
-#login {
-    display: flex; /* or inline-flex */
-    align-items: 'center';
-    justify-content: 'center';
+
+.signInButton {
+    float:none;
+    position:static;
+    display:block;
+    margin:auto;
+    width:max-content;
+  }
+
+div {
+  width: 100%;
+  height: auto;
+  margin: 1% 0;
+  text-align: center;
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  text {
+    margin: 0 auto;
+    padding: 10px;
+    text-align: center;
+    clear: left;
+    display: inline-block;
+    margin: 0 auto;
+  }
 }
